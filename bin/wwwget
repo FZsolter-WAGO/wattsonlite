@@ -10,56 +10,118 @@
 #                                                           #
 #############################################################
 
+# Parameters
 WATTSONLITE_REPOSITORY="https://raw.githubusercontent.com/FZsolter-WAGO/wattsonlite"
 
+# Functions
 get_device_details () {
     DEVICE_LABEL=$(/etc/config-tools/get_typelabel_value "ORDER")
     FIRMWARE_VERSION=$(/etc/config-tools/get_coupler_details firmware-revision)
 }
-list_versions () {
-    WATTSONLITE_VERSIONS=$(wget -qO- --no-check-certificate "$WATTSONLITE_REPOSITORY/main/versions" | grep $FIRMWARE_VERSION)
-    RETVAL=$WATTSONLITE_VERSIONS
-}
-
 get_device_details
 
+list_versions () {
+    RETVAL=$(wget -qO- --no-check-certificate "$WATTSONLITE_REPOSITORY/main/versions" | grep $FIRMWARE_VERSION)
+}
+
+# Color variables
+GN='\033[0;32m'
+NC='\033[0m'
+
+# Commands
 case $1 in
     list)
         list_versions
+        LATEST_VERSION=$(echo $RETVAL | grep default | head -n 1)
         if [ -n "$RETVAL" ]
         then
-            echo "For firmware $(echo "$RETVAL" | awk '{print $1}'):"
-            echo "$RETVAL" | while read line; do
-                echo "$(echo "$line" | awk '{print $2" "$3}')"
+            echo -e "$RETVAL" | while read line; do
+                echo -e "$(echo -e "$line" | awk '{print $2" "$3}')"
             done
+            touch /root/.wwwget
+            if [ "$LATEST_VERSION" != "$(cat /root/.wwwget)" ]
+            then
+                echo -e "${GN}New version available!${NC}"
+            fi
+        else
+            echo -e "No version found for $FIRMWARE_VERSION!"
         fi
         ;;
 
     install)
-        if [ -n "$2" ]
+        input2="$2"
+        input3="$3"
+        input4="$4"
+        if [ -n "$input2" ]
         then
-            if [ -n "$3" ]
+            if [ "$input2" = "latest" ]
             then
-                rm /tmp/wwwget -rf
-                mkdir -p /tmp/wwwget
-                wget -qO /tmp/wwwget/firmware_backup_codesys.tgz --no-check-certificate "$WATTSONLITE_REPOSITORY/main/packages/$DEVICE_LABEL/$2/$3/firmware_backup_codesys.tgz"
-                if [ -n "$(ls /tmp/wwwget)" ]
-                then
-                    /etc/config-tools/firmware_restore_admin -d device-medium=network upload-dir=/tmp/wwwget package-codesys=1 package-settings=0 package-system=0 passphrase= &>/dev/null
-                    echo "Runtime restore in progress..."
-                    while [ "$(/etc/config-tools/firmware_restore_status -q)" != "finished" ]
-                    do
-                        sleep 5
-                    done
-                    wget -qO /tmp/wwwget/install-wattsonlite-configurator_armhf.ipk --no-check-certificate "$WATTSONLITE_REPOSITORY/main/packages/$DEVICE_LABEL/$2/$3/install-wattsonlite-configurator_armhf.ipk"
-                    opkg install /tmp/wwwget/install-wattsonlite-configurator_armhf.ipk
-                    echo "Done!"
-                fi
+                list_versions
+                echo -e "Latest version is: $(echo $RETVAL | grep default | head -n 1 | awk '{print $2" "$3}')"
+                input2="$(echo $RETVAL | grep default | head -n 1 | awk '{print $2}')"
+                input3="$(echo $RETVAL | grep default | head -n 1 | awk '{print $3}')"
+                input4="$3"
             fi
+            if [ -n "$input3" ]
+            then
+                touch /root/.wwwget
+                if [ "$input4" = "force" ] || [ "$(cat /root/.wwwget | awk '{print $2" "$3}')" != "$input2 $input3" ]
+                then
+                    rm /tmp/wwwget -rf
+                    mkdir -p /tmp/wwwget
+                    wget -qO /tmp/wwwget/firmware_backup_codesys.tgz --no-check-certificate "$WATTSONLITE_REPOSITORY/main/packages/$DEVICE_LABEL/$input2/$input3/firmware_backup_codesys.tgz" &>/dev/null
+                    if [ -n "$(ls /tmp/wwwget)" ]
+                    then
+                        echo -e "Starting runtime restore..."
+                        /etc/config-tools/firmware_restore_admin -d device-medium=network upload-dir=/tmp/wwwget package-codesys=1 package-settings=0 package-system=0 passphrase= &>/dev/null
+                        while [ "$(/etc/config-tools/firmware_restore_status -q)" != "finished" ]
+                        do
+                            sleep 5
+                        done
+                        echo -n "$FIRMWARE_VERSION $input2 $input3" > /root/.wwwget
+                    else
+                        echo -e "Unable to download ${GN}$input2 $input3${NC} runtime backup package!"
+                    fi
+                    wget -qO /tmp/wwwget/install-wattsonlite-configurator_armhf.ipk --no-check-certificate "$WATTSONLITE_REPOSITORY/main/packages/$DEVICE_LABEL/$input2/$input3/install-wattsonlite-configurator_armhf.ipk" &>/dev/null
+                    if [ -n "$(ls /tmp/wwwget)" ]
+                    then
+                        echo -e "Starting configurator install..."
+                        opkg install /tmp/wwwget/install-wattsonlite-configurator_armhf.ipk &>/dev/null
+                    else
+                        echo -e "Unable to download ${GN}$input2 $input3${NC} configurator package!"
+                    fi
+                else
+                    echo -e ""
+                    echo -e "  Skipping install! Use force attribute to do otherwise"
+                    echo -e ""
+                fi
+            else
+                echo -e ""
+                echo -e "  Missing arguments!"
+                echo -e ""
+                echo -e "  Usage: ${GN}wwwget install <version> <edition>${NC}"
+                echo -e "  Example: ${GN}wwwget install 5.0.2 default${NC} or ${GN}wwwget install 5.0.2 default force${NC}"
+                echo -e ""
+                echo -e "  Use latest version's default edition: ${GN}wwwget install latest${NC} or ${GN}wwwget install latest force${NC}"
+                echo -e ""
+            fi
+        else
+            echo -e ""
+            echo -e "  Missing arguments!"
+            echo -e ""
+            echo -e "  Usage: ${GN}wwwget install <version> <edition>${NC}"
+            echo -e "  Example: ${GN}wwwget install 5.0.2 default${NC} or ${GN}wwwget install 5.0.2 default force${NC}"
+            echo -e ""
+            echo -e "  Use latest version's default edition: ${GN}wwwget install latest${NC} or ${GN}wwwget install latest force${NC}"
+            echo -e ""
         fi
         ;;
 
     *)
-        echo "Usage: (list|install)"
+        echo -e ""
+        echo -e "  wwwget 0.0.1 - Tool for downloading WattsONLite"
+        echo -e ""
+        echo -e "  Usage: ${GN}wwwget${NC} (${GN}list${NC}|${GN}install${NC})"
+        echo -e ""
         ;;
 esac
