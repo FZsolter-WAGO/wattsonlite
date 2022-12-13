@@ -1,0 +1,65 @@
+#!/bin/bash
+
+#############################################################
+#                                                           #
+# Bash script for installing WattsON Lite from Github       #
+#                                                           #
+# 2022.12.13.       0.0.1    Initial testing                #
+#                                                           #
+# WAGO Hungária Kft. - Fekete Zsolt <zsolt.fekete@wago.com> #
+#                                                           #
+#############################################################
+
+WATTSONLITE_REPOSITORY="https://raw.githubusercontent.com/FZsolter-WAGO/wattsonlite"
+
+get_device_details () {
+    DEVICE_LABEL=$(/etc/config-tools/get_typelabel_value "ORDER")
+    FIRMWARE_VERSION=$(/etc/config-tools/get_coupler_details firmware-revision)
+}
+list_versions () {
+    WATTSONLITE_VERSIONS=$(wget -qO- --no-check-certificate "$WATTSONLITE_REPOSITORY/main/versions" | grep $FIRMWARE_VERSION)
+    RETVAL=$WATTSONLITE_VERSIONS
+}
+
+get_device_details
+
+case $1 in
+    list)
+        list_versions
+        if [ -n "$RETVAL" ]
+        then
+            echo "For firmware $(echo "$RETVAL" | awk '{print $1}'):"
+            echo "$RETVAL" | while read line; do
+                echo "$(echo "$line" | awk '{print $2" "$3}')"
+            done
+        fi
+        ;;
+
+    install)
+        if [ -n "$2" ]
+        then
+            if [ -n "$3" ]
+            then
+                rm /tmp/wwwget -rf
+                mkdir -p /tmp/wwwget
+                wget -qO /tmp/wwwget/firmware_backup_codesys.tgz --no-check-certificate "$WATTSONLITE_REPOSITORY/main/packages/$DEVICE_LABEL/$2/$3/firmware_backup_codesys.tgz"
+                if [ -n "$(ls /tmp/wwwget)" ]
+                then
+                    /etc/config-tools/firmware_restore_admin -d device-medium=network upload-dir=/tmp/wwwget package-codesys=1 package-settings=0 package-system=0 passphrase= &>/dev/null
+                    echo "Runtime restore in progress..."
+                    while [ "$(/etc/config-tools/firmware_restore_status -q)" != "finished" ]
+                    do
+                        sleep 5
+                    done
+                    wget -qO /tmp/wwwget/install-wattsonlite-configurator_armhf.ipk --no-check-certificate "$WATTSONLITE_REPOSITORY/main/packages/$DEVICE_LABEL/$2/$3/install-wattsonlite-configurator_armhf.ipk"
+                    opkg install /tmp/wwwget/install-wattsonlite-configurator_armhf.ipk
+                    echo "Done!"
+                fi
+            fi
+        fi
+        ;;
+
+    *)
+        echo "Usage: (list|install)"
+        ;;
+esac
