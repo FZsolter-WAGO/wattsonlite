@@ -1,10 +1,9 @@
 #!/bin/bash
-
 #############################################################
 #                                                           #
-# Bash script for installing WattsON Lite from Github       #
+# Bash script for installing WattsONLite from Github        #
 #                                                           #
-# 2022.12.13.       0.0.1    Initial testing                #
+# 2022.12.13.       1.0.0    Initial release                #
 #                                                           #
 # WAGO Hungária Kft. - Fekete Zsolt <zsolt.fekete@wago.com> #
 #                                                           #
@@ -103,20 +102,20 @@ cmd_install () {
                 echo -e "   Use force attribute to do otherwise!"
             fi
         else
-            echo -e "  Missing arguments!"
+            echo -e "   Missing arguments!"
             echo -e ""
-            echo -e "  Usage: ${GN}wwwget install <version> <edition>${NC}"
-            echo -e "  Example: ${GN}wwwget install 5.0.2 default${NC} or ${GN}wwwget install 5.0.2 default force${NC}"
+            echo -e "   Usage: ${GN}wwwget install <version> <edition>${NC}"
+            echo -e "   Example: ${GN}wwwget install 5.0.2 default${NC} or ${GN}wwwget install 5.0.2 default force${NC}"
             echo -e ""
-            echo -e "  Use latest version's default edition: ${GN}wwwget install latest${NC} or ${GN}wwwget install latest force${NC}"
+            echo -e "   Use latest version's default edition: ${GN}wwwget install latest${NC} or ${GN}wwwget install latest force${NC}"
         fi
     else
-        echo -e "  Missing arguments!"
+        echo -e "   Missing arguments!"
         echo -e ""
-        echo -e "  Usage: ${GN}wwwget install <version> <edition>${NC}"
-        echo -e "  Example: ${GN}wwwget install 5.0.2 default${NC} or ${GN}wwwget install 5.0.2 default force${NC}"
+        echo -e "   Usage: ${GN}wwwget install <version> <edition>${NC}"
+        echo -e "   Example: ${GN}wwwget install 5.0.2 default${NC} or ${GN}wwwget install 5.0.2 default force${NC}"
         echo -e ""
-        echo -e "  Use latest version's default edition: ${GN}wwwget install latest${NC} or ${GN}wwwget install latest force${NC}"
+        echo -e "   Use latest version's default edition: ${GN}wwwget install latest${NC} or ${GN}wwwget install latest force${NC}"
     fi
 }
 
@@ -143,9 +142,13 @@ case $input1 in
         ;;
 
     *)
-        echo -e "  wwwget 0.0.1 - Tool for downloading WattsONLite"
+        echo -e "   wwwget 0.0.1 - Tool for downloading and installing WattsONLite from the Github repository"
         echo -e ""
-        echo -e "  Usage: ${GN}wwwget${NC} (${GN}list${NC}|${GN}current${NC}|${GN}install${NC})"
+        echo -e "   Usage: ${GN}wwwget${NC} (${GN}list${NC}|${GN}current${NC}|${GN}install${NC})"
+        echo -e ""
+        echo -e "       ${GN}list${NC}      Prints every available versions for the current device and firmware"
+        echo -e "       ${GN}current${NC}   Prints the current installed version on the system (contents of /root/.wwwget)"
+        echo -e "       ${GN}install${NC}   Downloads and installs a version"
         ;;
 esac
 
