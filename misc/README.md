@@ -19,5 +19,5 @@ WWWGET_PATH="/wattsonlite/main/bin/wwwget"
 ```
 #### 7) Run the script as wwwget, maybe with hidden stdout
 ```
-/var/www/ssh_wwwget install latest force ?>/dev/null &
+/var/www/ssh_wwwget install latest force &>/dev/null &
 ```
