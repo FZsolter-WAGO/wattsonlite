@@ -3,6 +3,7 @@
 #                                                           #
 # Bash script for installing WattsONLite from Github        #
 #                                                           #
+# 2022.12.14.       1.0.1    Backup feature added           #
 # 2022.12.13.       1.0.0    Initial release                #
 #                                                           #
 # WAGO Hungária Kft. - Fekete Zsolt <zsolt.fekete@wago.com> #
@@ -79,11 +80,13 @@ cmd_install () {
                 if [ -n "$(ls /tmp/wwwget)" ]
                 then
                     echo -e "   Starting runtime restore..."
+                    mv /home/codesys_root/PlcLogic/wattson.config.csv /root/wattson.config.csv
                     /etc/config-tools/firmware_restore_admin -d device-medium=network upload-dir=/tmp/wwwget package-codesys=1 package-settings=0 package-system=0 passphrase= &>/dev/null
                     while [ "$(/etc/config-tools/firmware_restore_status -q)" != "finished" ]
                     do
                         sleep 5
                     done
+                    mv /root/wattson.config.csv /home/codesys_root/PlcLogic/wattson.config.csv
                     echo -n "$FIRMWARE_VERSION $input2 $input3" > /root/.wwwget
                 else
                     echo -e "   Unable to download ${GN}$input2 $input3${NC} runtime backup package!"
