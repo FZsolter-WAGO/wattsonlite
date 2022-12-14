@@ -6,8 +6,8 @@
 #### 3) Restart apache2 service
 #### 4) Copy these files somewhere onto the server, /var/www location is prefered
 #### 5) Modify the file plc_list
-> <PLC 1 IP address> <root password>
-> <PLC 2 IP address> <root password>
+> -PLC 1 IP address- -root password-
+  -PLC 2 IP address- -root password-
 #### 6) Modify the script ssh_wwwget
 > WATTSON_HOST="http://<Server IP address>"
 > WWWGET_PATH="/wattsonlite/main/bin/wwwget"
