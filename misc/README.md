@@ -1,7 +1,7 @@
 ﻿# WattsONLite Offline installer
 
 #### 1) Copy the repository onto the WattsON server, like /var/www/wattson/backend/wattsonlite/main/versions
-#### 2) Modify the vhost file by adding a new alias:
+#### 2) Modify the vhost file by adding a new alias
 ```
 Alias /wattsonlite /var/www/wattson/backend/wattsonlite
 ```
