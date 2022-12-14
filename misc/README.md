@@ -1,5 +1,6 @@
 ﻿# WattsONLite Offline installer
 
+#### 0) Install sshpass
 #### 1) Copy the repository onto the WattsON server, like /var/www/wattson/backend/wattsonlite/main/versions
 #### 2) Modify the script /var/www/wattson/backend/wattsonlite/main/bin/wwwget
 ```
