@@ -6,4 +6,4 @@ WWWGET_ARGS="$1 $2 $3"
 
 while read -u 9 line; do
     sshpass -p $(echo $line | awk '{print $2}') ssh -oStrictHostKeyChecking=no root@$(echo $line | awk '{print $1}') "wget -qO- --no-check-certificate $WATTSON_HOST$WWWGET_PATH | bash -s $WWWGET_ARGS" &
-done 9< plc_list
+done 9< $(dirname "$(which "$0")")/plc_list
