@@ -3,12 +3,17 @@
 #                                                           #
 # Bash script for installing WattsONLite from Github        #
 #                                                           #
+# 2023.03.30.       1.0.2    Hotfix - error when used in    #
+#                            the codesys folder             #
 # 2022.12.14.       1.0.1    Backup feature added           #
 # 2022.12.13.       1.0.0    Initial release                #
 #                                                           #
 # WAGO Hungária Kft. - Fekete Zsolt <zsolt.fekete@wago.com> #
 #                                                           #
 #############################################################
+
+# 1.0.2 hotfix
+cd /
 
 # Parameters
 WATTSONLITE_REPOSITORY="https://raw.githubusercontent.com/FZsolter-WAGO/wattsonlite"
