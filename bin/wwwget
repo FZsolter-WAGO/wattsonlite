@@ -150,7 +150,7 @@ case $input1 in
         ;;
 
     *)
-        echo -e "   wwwget 0.0.1 - Tool for downloading and installing WattsONLite from the Github repository"
+        echo -e "   wwwget 1.0.2 - Tool for downloading and installing WattsONLite from the Github repository"
         echo -e ""
         echo -e "   Usage: ${GN}wwwget${NC} (${GN}list${NC}|${GN}current${NC}|${GN}install${NC})"
         echo -e ""
