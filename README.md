@@ -1,6 +1,3 @@
-# DEPRECATED! Please use wmslite instead
-## https://github.com/FZsolter-WAGO/wmslite
-
 # WattsONLite Online installer
 
 Quick and dirty way of using this:
