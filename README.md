@@ -1,4 +1,6 @@
-﻿# WattsONLite Online installer
+# DEPRECATED! Please use wmslite instead
+
+# WattsONLite Online installer
 
 Quick and dirty way of using this:
 ```
